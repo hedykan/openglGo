@@ -30,19 +30,9 @@ const (
 )
 
 var (
-	triangle = []float32{
+	vertices = []float32{
 		-0.5, 0.5, 0,
 		-0.5, -0.5, 0,
-		0.5, -0.5, 0,
-		-0.5, 0.5, 0,
-	}
-	square = []float32{
-		-0.5, 0.5, 0,
-		-0.5, -0.5, 0,
-		0.5, -0.5, 0,
-
-		-0.5, 0.5, 0,
-		0.5, 0.5, 0,
 		0.5, -0.5, 0,
 	}
 
@@ -77,58 +67,23 @@ func main() {
 	window := initGlfw()
 	defer glfw.Terminate()
 	program := initOpenGL()
-	vao := makeVao(triangle, indices)
-	// cells := makeCells()
+	vao := makeVao(vertices, indices)
 
 	gl.ClearColor(0.2, 0.3, 0.3, 1.0)
 	sprite := Sprite{0, 0}
 
 	for !window.ShouldClose() {
 		processInput(window, &sprite)
-		drawTri(vao, window, program)
-
-		// cellBuff := make([][]*cell, rows, rows)
-		// cellBuff[sprite.x] = append(cellBuff[sprite.x], cells[sprite.x][sprite.y])
-		// drawOne(cells[sprite.x][sprite.y], window, program)
-		// draw(cellBuff, window, program)
-		// t := time.Now()
-		// time.Sleep(time.Second/time.Duration(fps) - time.Since(t))
+		draw(vao, window, program)
 	}
 }
 
-func drawOne(cell *cell, window *glfw.Window, program uint32) {
-	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	gl.UseProgram(program)
-
-	cell.draw()
-
-	glfw.PollEvents()
-	window.SwapBuffers()
-}
-
-func draw(cells [][]*cell, window *glfw.Window, program uint32) {
-	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	gl.UseProgram(program)
-
-	var local uint8 = 1
-	gl.Uniform4f(gl.GetUniformLocation(program, &local), 1, 1, 1, 1)
-
-	for x := range cells {
-		for _, c := range cells[x] {
-			c.draw()
-		}
-	}
-
-	glfw.PollEvents()
-	window.SwapBuffers()
-}
-
-func drawTri(vao uint32, window *glfw.Window, program uint32) {
+func draw(vao uint32, window *glfw.Window, program uint32) {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	gl.UseProgram(program)
 	gl.BindVertexArray(vao)
-	gl.DrawArrays(gl.TRIANGLES, 0, int32(len(triangle)/3))
-	// gl.DrawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, gl.Ptr(indices))
+	// gl.DrawArrays(gl.TRIANGLES, 0, int32(len(vertices)/3))
+	gl.DrawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, gl.Ptr(indices))
 	glfw.PollEvents()
 	window.SwapBuffers()
 }
